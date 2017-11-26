@@ -1,0 +1,451 @@
+# vim: filetype=i3
+
+###---i3 Gaps Configuration---###
+
+#This is my commented i3-gaps configuration file
+#Me: Fabian Thut
+
+
+###---Basic Definitions---###
+
+# Core Definitions  
+set $mod Mod4                            # Sets the Window key as Mod key
+
+# i3 gaps Basic Definitions
+hide_edge_borders both                   # Shows boarders of windows (for gaps)
+for_window [class="^.*"] border pixel 0  # Special windows boarders
+gaps inner 15                            # Set default inner gaps
+gaps outer 15                            # Set default outer gaps
+
+# Fonts
+font pango:hack 9                        # Define font
+# font pango:DejaVu Sans Mono 10
+
+# Define Specific Scripts and Programs
+set $video --no-startup-id bash ~/.config/Scripts/video.sh
+										 # Run video script
+set $stoprec --no-startup-id killall ffmpeg & killall screenkey
+										 # Stops recording
+set $flash --no-startup-id bash ~/.config/Scripts/flash_win.sh
+										 # Run flash scripts
+set $browser firefox                     # Sets the web browser program
+set $term urxvt                          # Sets the terminal program
+
+###---Starting External Scripts---###
+
+# Internal Programs
+exec --no-startup-id mpd                 # Music player daemon
+exec --no-startup-id transmission-daemon # Torrent daemon
+exec --no-startup-id nm-applet           # Wifi applet
+exec --no-startup-id sudo mount -a       # Mount other drives
+exec --no-startup-id compton             # Composite manager
+exec_always --no-startup-id ~/.config/polybar/launch.sh
+     								     # Launch Polybar
+#exec_always --no-startup-id setxkbmap -layout us -variant altgr-intl -option caps:escape
+                                         # US international keyboard & caps to escape
+#exec_always --no-startup-id xmodmap -e 'keycode 135 = Super_R'
+#bindsym Menu	exec --no-startup-id xmodmap -e 'keycode 135 = Super_R'
+										 # Remap Menu button to Super
+exec --no-startup-id unclutter           # Make the mouse invisible after some time
+
+# Written Scripts
+exec --no-startup-id python ~/.config/Scripts/shortcuts.py
+										 # Refresh bash/ranger shortcuts
+exec --no-startup-id ~/.config/Scripts/screen.sh v
+										 # Try to load VGA screen
+exec --no-startup-id feh --bg-scale ~/.config/wall.png
+										 # Add wallpaper
+
+###---Audio and Music Definitions
+
+# MPC
+set $music urxvt -e ncmpcpp              # Start music interface
+set $pause --no-startup-id mpc toggle    # Pause music
+set $trupause --no-startup-id mpc pause  # Pause music
+set $next --no-startup-id mpc next       # Next song
+set $prev --no-startup-id mpc prev       # Previous song
+set $lilfor --no-startup-id mpc seek +10 # Little forward
+set $bigfor --no-startup-id mpc seek +120# Much forward
+set $lilbak --no-startup-id mpc seek -10 # Little back
+set $bigbak --no-startup-id mpc seek -120# Much back
+set $beg --no-startup-id mpc seek 0%     # Restart
+
+# MOC
+#set $music urxvt -e mocp                # Start music interface
+#set $pause --no-startup-id mocp -G      # Pause music
+#set $truepause --no-startup-id mocp -P  # Pause music
+#set $next --no-startup-id mocp -f       # Next song
+#set $prev --no-startup-id mocp -r       # Previous song
+#set $lilfor --no-startup-id mocp -k 10  # Little forward
+#set $bigfor --no-startup-id mocp -k 120 # Much forward
+#set $lilbak --no-startup-id mocp -k -10 # Little back
+#set $bigbak --no-startup-id mocp -k -120# Much back
+#set $beg --no-startup-id mocp -j 0%     # Restart
+
+# ALSA/AMIXER
+set $inc --no-startup-id amixer sset Master 2%+
+										 # Little increase
+set $biginc --no-startup-id amixer sset Master 5%+
+										 # Big increase
+set $dec --no-startup-id amixer sset Master 2%-
+									     # Little decrease
+set $bigdec --no-startup-id amixer sset Master 5%-
+										 # Big decrease
+set $mute --no-startup-id amixer sset Master toggle
+										 # Mute
+set $truemute --no-startup-id amixer sset Master mute
+										 # Mute
+set $screencast  --no-startup-id bash ~/.config/Scripts/screencast_alsa.sh
+										 # Screencast
+set $audio --no-startup-id bash ~/.config/Scripts/audio_alsa.sh
+										 # Audio
+
+###---Dropwdown/Scratchpad Windows---###
+
+# tmux for background scripts (mod+u)
+for_window [instance="dropdown"] floating enable
+for_window [instance="dropdown"] resize set 625 400
+for_window [instance="dropdown"] move position center
+for_window [instance="dropdown"] move scratchpad
+exec --no-startup-id $term -name dropdown -e tmux
+
+# Basic R (mod+a)
+for_window [instance="math"] floating enable
+for_window [instance="math"] resize set 800 300
+for_window [instance="math"] move position center
+for_window [instance="math"] move scratchpad
+exec --no-startup-id $term -fn "xft:mono:pixelsize=24" -name math -e R -q
+
+###---Basic Bindings---###
+floating_modifier $mod                   # Use mod+mouse to move floating window
+bindsym $mod+Return 	     exec $term  
+										 # Open terminal
+bindsym $mod+Shift+Return    exec $term -e tmux
+									     # Open tmux
+
+bindsym $mod+Shift+space 	 floating toggle
+										 # Toggle
+bindsym $mod+space		     focus mode_toggle
+										 # Mode Toggle
+
+bindsym $mod+Escape		     workspace prev
+                                         # Go to previous Workspace
+bindsym $mod+Shift+Escape 	 exec i3-msg exit
+										 # Exit i3
+
+bindsym $mod+BackSpace		 exec $flash
+										 # Run script "flash"
+bindsym $mod+Shift+BackSpace exec sudo reboot
+										 # Reboot system
+
+bindsym $mod+grave		     exec $flash
+										 # Run script "flash"
+bindsym $mod+Shift+Delete	 exec $truemute ; exec $truepause ; workspace lmao ; exec $term -e htop ; exec $term -e ranger
+										 # Porno Mode
+
+###---Letter Key Bindings---###
+bindsym $mod+q			     kill
+bindsym $mod+Shift+q		 kill
+
+bindsym $mod+w			     exec --no-startup-id $term -e w3m http://lukesmith.xyz
+bindsym $mod+Shift+w		 exec --no-startup-id $browser
+
+bindsym $mod+e			     exec $term -e mutt 
+bindsym $mod+Shift+e         exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+bindsym $mod+r 			     exec $term -e ranger
+bindsym $mod+Shift+r		 restart
+
+bindsym $mod+t			     split toggle
+bindsym $mod+Shift+t		 gaps inner current set 15; gaps outer current set 15
+
+bindsym $mod+y			     exec $term -e calcurse 
+bindsym $mod+Shift+y		 resize shrink width 10 px or 10ppt
+
+bindsym $mod+u			     [instance="dropdown"] scratchpad show; move position center
+bindsym $mod+Shift+u		 resize shrink height 10 px or 10 ppt
+
+bindsym $mod+i 			     exec $term -e htop
+bindsym $mod+Shift+i		 resize grow height 10 px or 10 ppt
+
+bindsym $mod+o			     exec --no-startup-id $beg
+bindsym $mod+Shift+o		 resize grow width 10 px or 10 ppt
+
+bindsym $mod+p			     exec $pause
+bindsym $mod+Shift+p		 exec mypaint
+
+bindsym $mod+a			     [instance="math"] scratchpad show; move position center
+bindsym $mod+Shift+a		 exec $term -e alsamixer
+
+bindsym $mod+s			     gaps inner current plus 5
+bindsym $mod+Shift+s		 gaps inner current minus 5
+
+bindsym $mod+d			     exec rofi -show run
+bindsym $mod+Shift+d		 gaps inner current set 0; gaps outer current set 0
+
+bindsym $mod+f			     fullscreen toggle
+#bindsym $mod+Shift+f
+
+bindsym $mod+g			     workspace prev
+bindsym $mod+Shift+g		 exec --no-startup-id gimp; workspace $ws5
+
+bindsym $mod+h			     focus left
+bindsym $mod+Shift+h		 move left 30
+
+bindsym $mod+j			     focus down
+bindsym $mod+Shift+j		 move down 30
+
+bindsym $mod+k			     focus up
+bindsym $mod+Shift+k		 move up 30
+
+bindsym $mod+l			     focus right
+bindsym $mod+Shift+l		 move right 30
+
+bindsym $mod+z			     gaps outer current plus 5
+bindsym $mod+Shift+z		 gaps outer current minus 5
+
+bindsym $mod+x			     exec --no-startup-id ~/.config/i3/lock.sh
+bindsym $mod+Shift+x		 exec sudo shutdown -h now
+
+bindsym $mod+c			     exec $term -e weechat
+bindsym $mod+Shift+c		 reload
+
+bindsym $mod+v			     exec urxvt -e ncmpcpp -s visualizer
+#bindsym $mod+Shift+v
+
+bindsym $mod+b			     exec $prev
+bindsym $mod+Shift+b		 exec --no-startup-id blender; workspace $ws6
+
+bindsym $mod+n			     exec $next
+bindsym $mod+Shift+n		 exec $term -e newsbeuter
+
+bindsym $mod+m 			     exec $music
+bindsym $mod+Shift+m		 exec $mute
+
+# split h/split v/move left == move left 30?/stacking/tabbed
+
+###---Workspace Bindings---###
+
+# Define Workspaces
+set $ws1                     "1"
+set $ws2                     "2"
+set $ws3                     "3"
+set $ws4                     "4"
+set $ws5                     "5"
+set $ws6                     "6"
+set $ws7                     "7"
+set $ws8                     "8"
+set $ws9                     "9"
+set $ws10                    "10"
+
+# Switching workspaces
+bindsym $mod+1		         workspace $ws1
+bindsym $mod+2		         workspace $ws2
+bindsym $mod+3		         workspace $ws3
+bindsym $mod+4		         workspace $ws4
+bindsym $mod+5		         workspace $ws5
+bindsym $mod+6		         workspace $ws6
+bindsym $mod+7		         workspace $ws7
+bindsym $mod+8		         workspace $ws8
+bindsym $mod+9		         workspace $ws9
+bindsym $mod+0		         workspace $ws10
+
+# Move focused container to workspace
+bindsym $mod+Shift+1		 move container to workspace $ws1
+bindsym $mod+Shift+2		 move container to workspace $ws2
+bindsym $mod+Shift+3		 move container to workspace $ws3
+bindsym $mod+Shift+4		 move container to workspace $ws4
+bindsym $mod+Shift+5		 move container to workspace $ws5
+bindsym $mod+Shift+6	 	 move container to workspace $ws6
+bindsym $mod+Shift+7		 move container to workspace $ws7
+bindsym $mod+Shift+8		 move container to workspace $ws8
+bindsym $mod+Shift+9		 move container to workspace $ws9
+bindsym $mod+Shift+0		 move container to workspace $ws10
+
+# Define Specific Bindings
+bindsym $mod+Home			 workspace $ws1
+bindsym $mod+Shift+Home		 move container to workspace $ws1
+bindsym $mod+End			 workspace $ws10
+bindsym $mod+Shift+End		 move container to workspace $ws10
+bindsym $mod+Prior			 workspace prev
+bindsym $mod+Shift+Prior	 move container to workspace prev
+bindsym $mod+Next			 workspace next
+bindsym $mod+Shift+Next		 move container to workspace next
+bindsym $mod+Tab			 workspace back_and_forth
+bindsym $mod+XF86Back		 workspace prev
+#bindsym $mod+Shift+XF86Back	
+bindsym $mod+XF86Forward	 workspace next
+#bindsym $mod+Shift+XF86Forward	
+bindsym $mod+semicolon		 workspace next
+bindsym $mod+apostrophe		 split horizontal ;; exec $term
+bindsym $mod+slash		     split vertical ;; exec $term
+bindsym $mod+Shift+slash	 kill
+bindsym $mod+backslash		 workspace back_and_forth
+
+# Open specific programs in specific workspaces
+for_window [class="Blender"] move to workspace $ws6
+for_window [class="Thunderbird"] move to workspace $ws9
+for_window [class="marble"] move to workspace $ws7
+#for_window [class="Firefox"] move to workspace $ws2
+for_window [title="GIMP Startup"] move workspace $ws5
+for_window [class="Gimp"] move workspace $ws5
+for_window [window_role="gimp-dock"] floating disable; move left; resize shrink width 50 px or 50ppt
+for_window [window_role="gimp-toolbox"] floating disable; move right; resize grow width 30 px or 30ppt
+for_window [window_role="tr-main"] move to workspace $ws8
+#for_window [title="projectM"] exec --no-startup-id transset -a --dec .25
+#for_window [class="st"] exec --no-startup-id transset -a --dec .25
+for_window [window_role="GtkFileChooserDialog"] resize shrink height 10 px
+
+workspace $ws6 gaps inner 0
+workspace $ws6 gaps outer 0
+workspace $ws5 gaps inner 0
+workspace $ws5 gaps outer 0
+workspace $ws8 gaps inner 0
+workspace $ws8 gaps outer 0
+
+###---Function Buttons---###
+#bindsym F1					 nop
+#bindsym F2
+#bindsym F3
+#bindsym F4
+#bindsym F5
+#bindsym F6
+#bindsym F7
+#bindsym F8
+#bindsym F9
+#bindsym F10
+bindsym F11					 fullscreen toggle
+#bindsym F12
+
+bindsym $mod+F1				 exec --no-startup-id mupdf ~/.config/Scripts/i3_guide.md.pdf
+bindsym $mod+F2				 exec --no-startup-id python ~/.config/Scripts/shortcuts.py
+bindsym $mod+F3				 exec --no-startup-id arandr
+bindsym $mod+F4				 exec --no-startup-id sudo zzz
+bindsym $mod+F5				 exec --no-startup-id sudo sv restart NetworkManager
+bindsym $mod+F6				 exec --no-startup-id urxvt -e transmission-remote-cli
+bindsym $mod+F7				 exec transset -a --dec .15
+bindsym $mod+F8				 exec transset -a --inc .15
+bindsym $mod+F9				 exec --no-startup-id sudo mount -a
+bindsym $mod+F10			 exec --no-startup-id ~/.config/Scripts/screen.sh l ;; exec --no-startup-id ~/.config/polybar/launch.sh
+bindsym $mod+F11			 exec --no-startup-id ~/.config/Scripts/screen.sh v ;; exec --no-startup-id ~/.config/polybar/launch.sh
+bindsym $mod+F12			 exec --no-startup-id ~/.config/Scripts/screen.sh d ;; exec --no-startup-id ~/.config/polybar/launch.sh
+
+###---Arrow Keys---###
+bindsym $mod+Left			 focus left
+bindsym $mod+Down			 focus down
+bindsym $mod+Up				 focus up
+bindsym $mod+Right 			 focus right
+bindsym $mod+Shift+Left		 move left
+bindsym $mod+Shift+Down		 move down
+bindsym $mod+Shift+Up		 move up
+bindsym $mod+Shift+Right 	 move right
+
+###---Media Keys---###
+
+#Volume keys
+bindsym $mod+plus			 exec $inc
+bindsym $mod+Shift+plus		 exec $biginc
+bindsym $mod+minus 			 exec $dec
+bindsym $mod+Shift+minus	 exec $bigdec
+bindsym $mod+greater		 exec $inc
+bindsym $mod+Shift+greater	 exec $biginc
+bindsym $mod+less 			 exec $dec
+bindsym $mod+Shift+less		 exec $bigdec
+
+#For advancing forward/backward in an mpd song
+bindsym $mod+bracketleft 	 exec $lilbak
+bindsym $mod+Shift+bracketleft 	exec $bigbak
+bindsym $mod+bracketright 	 exec $lilfor
+bindsym $mod+Shift+bracketright exec $bigfor
+
+#Print screen takes a screenshot.
+bindsym Print 				 exec --no-startup-id scrot
+bindsym Shift+Print 		 exec --no-startup-id scrot -u
+
+#For recording audio/video or stop recording. Also screenkey for visual typing.
+bindsym $mod+Print			 exec --no-startup-id screenkey
+bindsym $mod+Scroll_Lock	 exec $audio
+bindsym $mod+Insert		 	 exec $screencast
+bindsym $mod+Pause			 exec $video
+bindsym $mod+Delete			 exec $stoprec
+bindsym XF86Launch1			 exec $stoprec
+
+###---Extra XF86 Keys---###
+bindsym XF86AudioMute		 exec $mute
+bindsym XF86AudioLowerVolume exec $dec
+bindsym XF86AudioRaiseVolume exec $inc
+bindsym XF86PowerOff		 exec sudo shutdown -h now
+#bindsym XF86Copy			 exec 
+#bindsym XF86Open			 exec 
+#bindsym XF86Paste			 exec 
+#bindsym XF86Cut			 exec 
+#bindsym XF86MenuKB			 exec 
+bindsym XF86Calculator		 exec $term -e R -q
+bindsym XF86Sleep			 exec sudo zzz
+#bindsym XF86WakeUp			 exec 
+bindsym XF86Explorer		 exec $term -e ranger
+#bindsym XF86Send			 exec 
+#bindsym XF86Xfer			 exec 
+bindsym XF86WWW				 exec --no-startup-id $browser
+#bindsym XF86DOS			 exec 
+bindsym XF86ScreenSaver		 exec exec --no-startup-id ~/.config/i3/lock.sh
+#bindsym XF86RotateWindows	 exec 
+#bindsym XF86TaskPane		 exec 
+#bindsym XF86Favorites		 exec 
+bindsym XF86MyComputer		 exec $term -e ranger
+#bindsym XF86Back			 exec 
+#bindsym XF86Forward		 exec 
+bindsym XF86Eject			 exec sudo umount -R /mnt
+bindsym XF86AudioNext		 exec $next
+bindsym XF86AudioPlay		 exec $pause
+bindsym XF86AudioPrev		 exec $prev
+bindsym XF86AudioStop		 exec $pause
+bindsym XF86AudioRecord		 exec $audio
+bindsym XF86AudioRewind		 exec $lilbak
+bindsym XF86AudioForward	 exec $lilfor
+#bindsym XF86Phone			 exec 
+#bindsym XF86Tools		 	 exec 
+bindsym XF86HomePage		 exec $browser https://lukesmith.xyz
+bindsym XF86Reload			 restart
+#bindsym XF86ScrollUp		 exec 
+#bindsym XF86ScrollDown		 exec 
+#bindsym XF86New			 exec 
+#bindsym XF86LaunchA		 exec
+#bindsym XF86LaunchB		 exec 
+#bindsym XF86Launch2		 exec 
+#bindsym XF86Launch3		 exec 
+#bindsym XF86Launch4		 exec 
+#bindsym XF86Launch5		 exec 
+#bindsym XF86Launch6		 exec 
+#bindsym XF86Launch7		 exec 
+#bindsym XF86Launch8		 exec 
+#bindsym XF86Launch9		 exec 
+bindsym XF86AudioMicMute	 exec $micmute
+#bindsym XF86TouchpadToggle	 exec 
+bindsym XF86TouchpadOn		 exec --no-startup-id exec synclient TouchpadOff=0
+bindsym XF86TouchpadOff		 exec --no-startup-id exec synclient TouchpadOff=1
+bindsym XF86Suspend		 	 exec --no-startup-id ~/.config/i3/lock.sh
+bindsym XF86Close		 	 kill
+bindsym XF86WebCam			 exec mpv /dev/video0
+bindsym XF86Mail			 exec $term -e mutt
+bindsym XF86Messenger		 exec $term -e weechat
+bindsym XF86Search			 exec $browser https://duckduckgo.com
+#bindsym XF86Go				 exec 
+#bindsym XF86Finance		 exec 
+#bindsym XF86Game			 exec 
+bindsym XF86Shop			 exec $browser https://ebay.com
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 15
+bindsym XF86MonBrightnessUp	 exec --no-startup-id xbacklight -inc 15
+bindsym XF86AudioMedia		 exec $music
+bindsym XF86Display			 exec --no-startup-id arandr
+#bindsym XF86KbdLightOnOff	 exec 
+bindsym XF86KbdBrightnessDown exec --no-startup-id xbacklight -dec 15
+bindsym XF86KbdBrightnessUp	 exec --no-startup-id xbacklight -inc 15
+#bindsym XF86Reply			 exec 
+#bindsym XF86MailForward	 exec 
+#bindsym XF86Save			 exec 
+bindsym XF86Documents		 exec $term -e ranger ~/Documents
+#bindsym XF86Battery		 exec 
+#bindsym XF86Bluetooth		 exec 
+bindsym XF86WLAN			 exec --no-startup-id sudo sv restart NetworkManager
+# Might want to include the DasKeyboard Volume Tab
